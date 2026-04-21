@@ -9,11 +9,9 @@ export function Layout({ children, settings }: PropsWithChildren<{ settings?: Si
 
   return (
     <div className="container">
-      <div className="nav">
+      <div className="nav nav-left">
         <Link to="/"><strong className="site-title">{settings.siteTitle}</strong></Link>
-        <div className="row">
-          <Link to="/">{settings.navigationLabel}</Link>
-        </div>
+        <Link to="/" className="nav-label">{settings.navigationLabel}</Link>
       </div>
       {children}
     </div>
