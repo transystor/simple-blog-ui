@@ -55,4 +55,4 @@ button, input, textarea, select { font: inherit; }
 .site-title { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; }
 
 .nav-left { justify-content: flex-start; gap: 18px; }
-.nav-label { font-size: 1.1rem; font-weight: 700; color: #374151; }
+.nav-label { font-size: 1.22rem; font-weight: 800; color: #374151; }
