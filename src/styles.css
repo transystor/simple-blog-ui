@@ -52,7 +52,7 @@ button, input, textarea, select { font: inherit; }
   margin-bottom: 24px;
 }
 
-.site-title { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; }
+.site-title { font-size: 1.22rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
 
-.nav-left { justify-content: flex-start; gap: 18px; }
-.nav-label { font-size: 1.22rem; font-weight: 800; color: #374151; }
+.nav-left { justify-content: flex-start; gap: 18px; align-items: baseline; }
+.nav-label { font-size: 1.22rem; font-weight: 600; color: #374151; line-height: 1; }
