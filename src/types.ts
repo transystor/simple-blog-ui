@@ -11,3 +11,9 @@ export interface Article {
   updatedAt: string;
   publishedAt?: string | null;
 }
+
+export interface SiteSettings {
+  siteTitle: string;
+  navigationLabel: string;
+  updatedAt: string;
+}

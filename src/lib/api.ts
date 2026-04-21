@@ -1,4 +1,4 @@
-import type { Article } from '../types';
+import type { Article, SiteSettings } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
@@ -30,9 +30,16 @@ export const api = {
     }),
   getArticles: () => request<Article[]>('/api/articles'),
   getArticle: (slug: string) => request<Article>(`/api/articles/${slug}`),
+  getSiteSettings: () => request<SiteSettings>('/api/site-settings'),
   getAdminArticles: (token: string) =>
     request<Article[]>('/api/admin/articles', {
       headers: { Authorization: `Bearer ${token}` }
+    }),
+  updateSiteSettings: (token: string, payload: SiteSettings) =>
+    request<SiteSettings>('/api/admin/site-settings', {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload)
     }),
   createArticle: (token: string, payload: Partial<Article>) =>
     request<Article>('/api/admin/articles', {

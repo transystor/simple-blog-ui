@@ -1,13 +1,22 @@
 import { Link } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
+import type { SiteSettings } from '../types';
 
-export function Layout({ children }: PropsWithChildren) {
+const defaultSettings: SiteSettings = {
+  siteTitle: 'Simple Blog',
+  navigationLabel: 'Blog',
+  updatedAt: new Date(0).toISOString()
+};
+
+export function Layout({ children, settings }: PropsWithChildren<{ settings?: SiteSettings | null }>) {
+  const site = settings ?? defaultSettings;
+
   return (
     <div className="container">
       <div className="nav">
-        <Link to="/"><strong>Simple Blog</strong></Link>
+        <Link to="/"><strong>{site.siteTitle}</strong></Link>
         <div className="row">
-          <Link to="/">Blog</Link>
+          <Link to="/">{site.navigationLabel}</Link>
         </div>
       </div>
       {children}
