@@ -8,7 +8,6 @@ export function Layout({ children }: PropsWithChildren) {
         <Link to="/"><strong>Simple Blog</strong></Link>
         <div className="row">
           <Link to="/">Blog</Link>
-          <Link to="/admin">Admin</Link>
         </div>
       </div>
       {children}

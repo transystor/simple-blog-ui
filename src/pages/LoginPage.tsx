@@ -5,8 +5,8 @@ import { api } from '../lib/api';
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@example.com');
-  const [password, setPassword] = useState('ChangeMe123!');
+  const [email, setEmail] = useState('robinzonejob@gmail.com');
+  const [password, setPassword] = useState('klavfzss666^^^');
   const [error, setError] = useState('');
 
   async function onSubmit(event: FormEvent) {
