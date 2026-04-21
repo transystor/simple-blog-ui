@@ -1,0 +1,54 @@
+import type { Article } from '../types';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${API_URL}${path}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(init?.headers || {})
+    },
+    ...init
+  });
+
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status}`);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return response.json() as Promise<T>;
+}
+
+export const api = {
+  login: (email: string, password: string) =>
+    request<{ accessToken: string }>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    }),
+  getArticles: () => request<Article[]>('/api/articles'),
+  getArticle: (slug: string) => request<Article>(`/api/articles/${slug}`),
+  getAdminArticles: (token: string) =>
+    request<Article[]>('/api/admin/articles', {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+  createArticle: (token: string, payload: Partial<Article>) =>
+    request<Article>('/api/admin/articles', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload)
+    }),
+  updateArticle: (token: string, id: string, payload: Partial<Article>) =>
+    request<Article>(`/api/admin/articles/${id}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload)
+    }),
+  deleteArticle: (token: string, id: string) =>
+    request<void>(`/api/admin/articles/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    })
+};
