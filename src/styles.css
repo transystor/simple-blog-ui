@@ -54,5 +54,5 @@ button, input, textarea, select { font: inherit; }
 
 .site-title { font-size: 1.22rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
 
-.nav-left { justify-content: flex-start; gap: 18px; align-items: baseline; }
+.nav-left { justify-content: flex-start; gap: 10px; align-items: baseline; }
 .nav-label { font-size: 1.22rem; font-weight: 600; color: #374151; line-height: 1; }
