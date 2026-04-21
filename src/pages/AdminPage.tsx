@@ -11,6 +11,7 @@ export function AdminPage() {
   const [editing, setEditing] = useState<Article | null>(null);
   const [creating, setCreating] = useState(false);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ siteTitle: 'Simple Blog', navigationLabel: 'Blog', updatedAt: new Date().toISOString() });
+  const [saveMessage, setSaveMessage] = useState('');
 
   async function load() {
     if (!token) return;
@@ -35,8 +36,9 @@ export function AdminPage() {
         <input className="input" value={siteSettings.siteTitle} onChange={e => setSiteSettings({ ...siteSettings, siteTitle: e.target.value })} placeholder="Site title" />
         <input className="input" value={siteSettings.navigationLabel} onChange={e => setSiteSettings({ ...siteSettings, navigationLabel: e.target.value })} placeholder="Navigation label" />
         <div className="row">
-          <button className="button" onClick={async () => { const updated = await api.updateSiteSettings(token, siteSettings); setSiteSettings(updated); }}>Save branding</button>
+          <button className="button" onClick={async () => { const updated = await api.updateSiteSettings(token, siteSettings); setSiteSettings(updated); setSaveMessage('Saved'); window.location.reload(); }}>Save branding</button>
         </div>
+        {saveMessage && <div className="muted">{saveMessage}</div>}
       </div>
 
       <div className="row">
