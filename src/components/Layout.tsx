@@ -10,7 +10,7 @@ export function Layout({ children, settings }: PropsWithChildren<{ settings?: Si
   return (
     <div className="container">
       <div className="nav">
-        <Link to="/"><strong>{settings.siteTitle}</strong></Link>
+        <Link to="/"><strong className="site-title">{settings.siteTitle}</strong></Link>
         <div className="row">
           <Link to="/">{settings.navigationLabel}</Link>
         </div>
