@@ -8,7 +8,7 @@ import type { Article, SiteSettings } from '../types';
 export function AdminPage() {
   const token = auth.getToken();
   const [articles, setArticles] = useState<Article[]>([]);
-  const [editing, setEditing] = useState<Article | null>(null);
+  const [editing, setРедактироватьing] = useState<Article | null>(null);
   const [creating, setCreating] = useState(false);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [saveMessage, setSaveMessage] = useState('');
@@ -33,7 +33,7 @@ export function AdminPage() {
     <div className="stack">
       {siteSettings && (
         <div className="card stack">
-          <h2 className="article-title">Site settings</h2>
+          <h2 className="article-title">Настройки</h2>
           <input className="input" value={siteSettings.siteTitle} onChange={e => setSiteSettings({ ...siteSettings, siteTitle: e.target.value })} placeholder="Site title" />
           <div className="site-links-stack">
             {siteSettings.headerLinks.map((link, index) => (
@@ -80,14 +80,14 @@ export function AdminPage() {
       )}
 
       <div className="row">
-        <button className="button" onClick={() => { setCreating(true); setEditing(null); }}>New article</button>
-        <button className="button secondary" onClick={() => { auth.clearToken(); window.location.href = '/admin/login'; }}>Logout</button>
+        <button className="button" onClick={() => { setCreating(true); setРедактироватьing(null); }}>Новый пост</button>
+        <button className="button secondary" onClick={() => { auth.clearToken(); window.location.href = '/admin/login'; }}>Выйти</button>
       </div>
 
       {(creating || editing) && (
         <ArticleForm
           initialValue={editing || undefined}
-          onCancel={() => { setCreating(false); setEditing(null); }}
+          onCancel={() => { setCreating(false); setРедактироватьing(null); }}
           onSubmit={async value => {
             if (editing) {
               await api.updateArticle(token, editing.id, value);
@@ -95,7 +95,7 @@ export function AdminPage() {
               await api.createArticle(token, value);
             }
             setCreating(false);
-            setEditing(null);
+            setРедактироватьing(null);
             await load();
           }}
         />
@@ -110,8 +110,8 @@ export function AdminPage() {
                 <div className="muted">{article.slug} · {String(article.status)}</div>
               </div>
               <div className="row">
-                <button className="button secondary" onClick={() => { setEditing(article); setCreating(false); }}>Edit</button>
-                <button className="button danger" onClick={async () => { await api.deleteArticle(token, article.id); await load(); }}>Delete</button>
+                <button className="button secondary" onClick={() => { setРедактироватьing(article); setCreating(false); }}>Редактировать</button>
+                <button className="button danger" onClick={async () => { await api.deleteArticle(token, article.id); await load(); }}>Удалить</button>
               </div>
             </div>
             <p>{article.summary}</p>
