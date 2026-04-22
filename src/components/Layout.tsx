@@ -9,9 +9,15 @@ export function Layout({ children, settings }: PropsWithChildren<{ settings?: Si
 
   return (
     <div className="container">
-      <div className="nav nav-left">
-        <Link to="/"><strong className="site-title">{settings.siteTitle}</strong></Link>
-        <Link to="/" className="nav-label">{settings.navigationLabel}</Link>
+      <div className="nav">
+        <div className="nav-left">
+          <Link to="/"><strong className="site-title">{settings.siteTitle}</strong></Link>
+        </div>
+        <div className="nav-right">
+          {[...settings.headerLinks].reverse().map((link, index) => (
+            <Link key={`${link.label}-${index}`} to={link.url || '/'} className="nav-label">{link.label}</Link>
+          ))}
+        </div>
       </div>
       {children}
     </div>

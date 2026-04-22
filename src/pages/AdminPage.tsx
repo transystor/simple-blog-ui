@@ -35,9 +35,45 @@ export function AdminPage() {
         <div className="card stack">
           <h2 className="article-title">Site settings</h2>
           <input className="input" value={siteSettings.siteTitle} onChange={e => setSiteSettings({ ...siteSettings, siteTitle: e.target.value })} placeholder="Site title" />
-          <input className="input" value={siteSettings.navigationLabel} onChange={e => setSiteSettings({ ...siteSettings, navigationLabel: e.target.value })} placeholder="Navigation label" />
+          <div className="site-links-stack">
+            {siteSettings.headerLinks.map((link, index) => (
+              <div key={index} className="site-link-row">
+                <input
+                  className="input"
+                  value={link.label}
+                  onChange={e => setSiteSettings({
+                    ...siteSettings,
+                    headerLinks: siteSettings.headerLinks.map((item, itemIndex) => itemIndex === index ? { ...item, label: e.target.value } : item)
+                  })}
+                  placeholder="Link label"
+                />
+                <input
+                  className="input"
+                  value={link.url}
+                  onChange={e => setSiteSettings({
+                    ...siteSettings,
+                    headerLinks: siteSettings.headerLinks.map((item, itemIndex) => itemIndex === index ? { ...item, url: e.target.value } : item)
+                  })}
+                  placeholder="Link URL"
+                />
+                <button
+                  className="button danger icon-button"
+                  type="button"
+                  disabled={siteSettings.headerLinks.length === 1}
+                  onClick={() => {
+                    if (siteSettings.headerLinks.length === 1) return;
+                    setSiteSettings({
+                      ...siteSettings,
+                      headerLinks: siteSettings.headerLinks.filter((_, itemIndex) => itemIndex !== index)
+                    });
+                  }}
+                >−</button>
+              </div>
+            ))}
+          </div>
           <div className="row">
             <button className="button" onClick={async () => { const updated = await api.updateSiteSettings(token, siteSettings); setSiteSettings(updated); setSaveMessage('Saved'); window.location.reload(); }}>Save branding</button>
+            <button className="button secondary icon-button" type="button" onClick={() => setSiteSettings({ ...siteSettings, headerLinks: [...siteSettings.headerLinks, { label: 'новая ссылка', url: '/' }] })}>+</button>
           </div>
           {saveMessage && <div className="muted">{saveMessage}</div>}
         </div>

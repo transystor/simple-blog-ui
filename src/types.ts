@@ -12,8 +12,13 @@ export interface Article {
   publishedAt?: string | null;
 }
 
+export interface HeaderLink {
+  label: string;
+  url: string;
+}
+
 export interface SiteSettings {
   siteTitle: string;
-  navigationLabel: string;
+  headerLinks: HeaderLink[];
   updatedAt: string;
 }
