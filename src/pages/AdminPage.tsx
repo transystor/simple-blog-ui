@@ -11,6 +11,7 @@ export function AdminPage() {
   const [editing, setРедактироватьing] = useState<Article | null>(null);
   const [creating, setCreating] = useState(false);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
+  const [settingsLoading, setSettingsLoading] = useState(true);
   const [saveMessage, setSaveMessage] = useState('');
 
   async function load() {
@@ -21,6 +22,7 @@ export function AdminPage() {
     ]);
     setArticles(items);
     setSiteSettings(settings);
+    setSettingsLoading(false);
   }
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export function AdminPage() {
 
   return (
     <div className="stack">
-      {siteSettings && (
+      {!settingsLoading && siteSettings && (
         <div className="card stack">
           <h2 className="article-title">Настройки</h2>
           <input className="input" value={siteSettings.siteTitle} onChange={e => setSiteSettings({ ...siteSettings, siteTitle: e.target.value })} placeholder="Site title" />
