@@ -57,5 +57,16 @@ export const api = {
     request<void>(`/api/admin/articles/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` }
-    })
+    }),
+  uploadImage: async (token: string, file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    const response = await fetch(`${API_URL}/api/admin/upload-image`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form
+    });
+    if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
+    return response.json() as Promise<{ url: string }>;
+  },
 };

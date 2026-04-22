@@ -20,7 +20,7 @@ export function ArticlePage() {
         <p className="muted">{article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Draft'}</p>
       </div>
       <p>{article.summary}</p>
-      <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{article.content}</div>
+      <div style={{ lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: article.content }} />
     </article>
   );
 }
