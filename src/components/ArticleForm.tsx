@@ -80,8 +80,8 @@ export function ArticleForm({
         <ReactQuill ref={quillRef} theme="snow" value={content} onChange={setContent} modules={modules} />
       </div>
       <div className="form-actions">
-        <button className="button" type="submit">Save</button>
-        {onCancel && <button className="button secondary" type="button" onClick={onCancel}>Cancel</button>}
+        <button className="button" type="submit">Сохранить</button>
+        {onCancel && <button className="button secondary" type="button" onClick={onCancel}>Отмена</button>}
       </div>
     </form>
   );
