@@ -56,3 +56,8 @@ button, input, textarea, select { font: inherit; }
 
 .nav-left { justify-content: flex-start; gap: 10px; align-items: baseline; }
 .nav-label { font-size: 1.22rem; font-weight: 600; color: #374151; line-height: 1; }
+
+.ql-container { min-height: 220px; }
+.ql-editor { min-height: 180px; }
+.ql-toolbar.ql-snow, .ql-container.ql-snow { border-color: #d1d5db; }
+.ql-snow { background: white; }
