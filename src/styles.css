@@ -10,6 +10,7 @@
 body { margin: 0; }
 a { color: inherit; text-decoration: none; }
 button, input, textarea, select { font: inherit; }
+form { margin: 0; }
 
 .container {
   max-width: 960px;
@@ -66,3 +67,17 @@ button, input, textarea, select { font: inherit; }
 .card form, form.card { overflow: visible; }
 
 .card.stack { padding-bottom: 56px; }
+
+.article-form {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+
+.article-form .form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+  padding-bottom: 12px;
+}

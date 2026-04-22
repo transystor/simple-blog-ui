@@ -68,7 +68,7 @@ export function ArticleForm({
   }
 
   return (
-    <form className="card stack" onSubmit={handleSubmit}>
+    <form className="card article-form" onSubmit={handleSubmit}>
       <input className="input" value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" />
       <input className="input" value={summary} onChange={e => setSummary(e.target.value)} placeholder="Summary" />
       <input className="input" value={slug} onChange={e => setSlug(e.target.value)} placeholder="Slug (optional)" />
@@ -77,7 +77,7 @@ export function ArticleForm({
         <option value="1">Published</option>
       </select>
       <ReactQuill ref={quillRef} theme="snow" value={content} onChange={setContent} modules={modules} />
-      <div className="row">
+      <div className="form-actions">
         <button className="button" type="submit">Save</button>
         {onCancel && <button className="button secondary" type="button" onClick={onCancel}>Cancel</button>}
       </div>
