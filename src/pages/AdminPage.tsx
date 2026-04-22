@@ -8,35 +8,43 @@ import type { Article, SiteSettings } from '../types';
 export function AdminPage() {
   const token = auth.getToken();
   const [articles, setArticles] = useState<Article[]>([]);
-  const [editing, setРедактироватьing] = useState<Article | null>(null);
+  const [editing, setEditing] = useState<Article | null>(null);
   const [creating, setCreating] = useState(false);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
-  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [saveMessage, setSaveMessage] = useState('');
 
-  async function load() {
+  async function loadArticles() {
     if (!token) return;
-    const [items, settings] = await Promise.all([
-      api.getAdminArticles(token),
-      api.getSiteSettings()
-    ]);
+    const items = await api.getAdminArticles(token);
     setArticles(items);
+  }
+
+  async function loadSettings() {
+    const settings = await api.getSiteSettings();
     setSiteSettings(settings);
-    setSettingsLoading(false);
   }
 
   useEffect(() => {
-    load();
-  }, []);
+    if (!token) return;
+
+    Promise.all([loadArticles(), loadSettings()]).finally(() => setLoading(false));
+  }, [token]);
 
   if (!token) return <Navigate to="/admin/login" replace />;
+  if (loading) return <div className="card">Грузим...</div>;
 
   return (
     <div className="stack">
-      {!settingsLoading && siteSettings && (
+      {siteSettings && (
         <div className="card stack">
           <h2 className="article-title">Настройки</h2>
-          <input className="input" value={siteSettings.siteTitle} onChange={e => setSiteSettings({ ...siteSettings, siteTitle: e.target.value })} placeholder="Site title" />
+          <input
+            className="input"
+            value={siteSettings.siteTitle}
+            onChange={e => setSiteSettings({ ...siteSettings, siteTitle: e.target.value })}
+            placeholder="Название сайта"
+          />
           <div className="site-links-stack">
             {siteSettings.headerLinks.map((link, index) => (
               <div key={index} className="site-link-row">
@@ -47,7 +55,7 @@ export function AdminPage() {
                     ...siteSettings,
                     headerLinks: siteSettings.headerLinks.map((item, itemIndex) => itemIndex === index ? { ...item, label: e.target.value } : item)
                   })}
-                  placeholder="Link label"
+                  placeholder="Текст ссылки"
                 />
                 <input
                   className="input"
@@ -56,7 +64,7 @@ export function AdminPage() {
                     ...siteSettings,
                     headerLinks: siteSettings.headerLinks.map((item, itemIndex) => itemIndex === index ? { ...item, url: e.target.value } : item)
                   })}
-                  placeholder="Link URL"
+                  placeholder="URL ссылки"
                 />
                 <button
                   className="button danger icon-button"
@@ -74,22 +82,40 @@ export function AdminPage() {
             ))}
           </div>
           <div className="row">
-            <button className="button" onClick={async () => { const updated = await api.updateSiteSettings(token, siteSettings); setSiteSettings(updated); setSaveMessage('Сохранено'); }}>Сохранить</button>
-            <button className="button secondary icon-button" type="button" onClick={() => setSiteSettings({ ...siteSettings, headerLinks: [...siteSettings.headerLinks, { label: 'новая ссылка', url: '/' }] })}>+</button>
+            <button
+              className="button"
+              onClick={async () => {
+                const updated = await api.updateSiteSettings(token, siteSettings);
+                setSiteSettings(updated);
+                setSaveMessage('Сохранено');
+              }}
+            >
+              Сохранить
+            </button>
+            <button
+              className="button secondary icon-button"
+              type="button"
+              onClick={() => setSiteSettings({
+                ...siteSettings,
+                headerLinks: [...siteSettings.headerLinks, { label: 'новая ссылка', url: '/' }]
+              })}
+            >
+              +
+            </button>
           </div>
           {saveMessage && <div className="muted">{saveMessage}</div>}
         </div>
       )}
 
       <div className="row">
-        <button className="button" onClick={() => { setCreating(true); setРедактироватьing(null); }}>Новый пост</button>
+        <button className="button" onClick={() => { setCreating(true); setEditing(null); }}>Новый пост</button>
         <button className="button secondary" onClick={() => { auth.clearToken(); window.location.href = '/admin/login'; }}>Выйти</button>
       </div>
 
       {(creating || editing) && (
         <ArticleForm
           initialValue={editing || undefined}
-          onCancel={() => { setCreating(false); setРедактироватьing(null); }}
+          onCancel={() => { setCreating(false); setEditing(null); }}
           onSubmit={async value => {
             if (editing) {
               await api.updateArticle(token, editing.id, value);
@@ -97,8 +123,8 @@ export function AdminPage() {
               await api.createArticle(token, value);
             }
             setCreating(false);
-            setРедактироватьing(null);
-            await load();
+            setEditing(null);
+            await loadArticles();
           }}
         />
       )}
@@ -112,8 +138,8 @@ export function AdminPage() {
                 <div className="muted">{article.slug} · {String(article.status)}</div>
               </div>
               <div className="row">
-                <button className="button secondary" onClick={() => { setРедактироватьing(article); setCreating(false); }}>Редактировать</button>
-                <button className="button danger" onClick={async () => { await api.deleteArticle(token, article.id); await load(); }}>Удалить</button>
+                <button className="button secondary" onClick={() => { setEditing(article); setCreating(false); }}>Редактировать</button>
+                <button className="button danger" onClick={async () => { await api.deleteArticle(token, article.id); await loadArticles(); }}>Удалить</button>
               </div>
             </div>
             <p>{article.summary}</p>
