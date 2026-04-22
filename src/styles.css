@@ -81,3 +81,6 @@ form { margin: 0; }
   margin-top: 8px;
   padding-bottom: 12px;
 }
+
+.ql-editor { padding-bottom: 56px; }
+.article-form .form-actions { position: relative; z-index: 2; }
