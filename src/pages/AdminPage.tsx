@@ -72,7 +72,7 @@ export function AdminPage() {
             ))}
           </div>
           <div className="row">
-            <button className="button" onClick={async () => { const updated = await api.updateSiteSettings(token, siteSettings); setSiteSettings(updated); setSaveMessage('Saved'); }}>Save branding</button>
+            <button className="button" onClick={async () => { const updated = await api.updateSiteSettings(token, siteSettings); setSiteSettings(updated); setSaveMessage('Сохранено'); }}>Сохранить</button>
             <button className="button secondary icon-button" type="button" onClick={() => setSiteSettings({ ...siteSettings, headerLinks: [...siteSettings.headerLinks, { label: 'новая ссылка', url: '/' }] })}>+</button>
           </div>
           {saveMessage && <div className="muted">{saveMessage}</div>}
