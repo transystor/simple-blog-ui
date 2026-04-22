@@ -84,3 +84,7 @@ form { margin: 0; }
 
 .ql-editor { padding-bottom: 56px; }
 .article-form .form-actions { position: relative; z-index: 2; }
+
+.article-form .ql-container { min-height: 320px; }
+.article-form .ql-editor { min-height: 260px; }
+.article-form .form-actions { margin-top: 20px; }
