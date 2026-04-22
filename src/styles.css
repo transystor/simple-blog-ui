@@ -61,3 +61,6 @@ button, input, textarea, select { font: inherit; }
 .ql-editor { min-height: 180px; }
 .ql-toolbar.ql-snow, .ql-container.ql-snow { border-color: #d1d5db; }
 .ql-snow { background: white; }
+
+.ql-container { margin-bottom: 16px; }
+.card form, form.card { overflow: visible; }
