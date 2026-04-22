@@ -11,7 +11,7 @@ export function ArticlePage() {
     api.getArticle(slug).then(setArticle);
   }, [slug]);
 
-  if (!article) return <div className="card">Loading article...</div>;
+  if (!article) return <div className="card">Грузим...</div>;
 
   return (
     <article className="card stack">

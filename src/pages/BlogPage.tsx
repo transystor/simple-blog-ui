@@ -13,7 +13,7 @@ export function BlogPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="card">Loading...</div>;
+  if (loading) return <div className="card">Грузим...</div>;
 
   return (
     <div className="stack">
