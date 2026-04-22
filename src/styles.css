@@ -64,3 +64,5 @@ button, input, textarea, select { font: inherit; }
 
 .ql-container { margin-bottom: 16px; }
 .card form, form.card { overflow: visible; }
+
+.card.stack { padding-bottom: 56px; }
