@@ -52,7 +52,11 @@ const CustomImage = Image.extend({
       }, [node.attrs.width]);
 
       const applyWidth = () => {
-        const normalized = width.trim();
+        let normalized = width.trim();
+        if (!normalized && align !== 'center') {
+          normalized = '60%';
+          setWidth('60%');
+        }
         updateAttributes({ width: normalized ? (/^\d+$/.test(normalized) ? `${normalized}px` : normalized) : null });
       };
 
