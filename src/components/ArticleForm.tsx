@@ -65,11 +65,13 @@ export function ArticleForm({
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    const currentContent = quillRef.current?.getEditor().root.innerHTML || content;
+    setContent(currentContent);
     await onSubmit({
       title,
       summary,
       slug,
-      content,
+      content: currentContent,
       status: Number(status)
     });
   }
