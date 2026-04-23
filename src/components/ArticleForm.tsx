@@ -10,6 +10,36 @@ Quill.register('modules/imageResize', ImageResize);
 
 type ArticleDraft = Partial<Article>;
 
+function normalizeEditorHtml(html: string) {
+  if (typeof document === 'undefined') return html;
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = html;
+
+  wrapper.querySelectorAll('img').forEach(image => {
+    const img = image as HTMLImageElement;
+    img.style.display = 'block';
+    img.style.maxWidth = '100%';
+    img.style.height = img.style.height || 'auto';
+
+    const marginLeft = img.style.marginLeft;
+    const marginRight = img.style.marginRight;
+
+    if ((marginLeft === '0px' || marginLeft === '0') && marginRight === 'auto') {
+      img.style.marginLeft = '0';
+      img.style.marginRight = 'auto';
+    } else if (marginLeft === 'auto' && (marginRight === '0px' || marginRight === '0')) {
+      img.style.marginLeft = 'auto';
+      img.style.marginRight = '0';
+    } else {
+      img.style.marginLeft = 'auto';
+      img.style.marginRight = 'auto';
+    }
+  });
+
+  return wrapper.innerHTML;
+}
+
 export function ArticleForm({
   initialValue,
   onSubmit,
@@ -65,7 +95,7 @@ export function ArticleForm({
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    const currentContent = quillRef.current?.getEditor().root.innerHTML || content;
+    const currentContent = normalizeEditorHtml(quillRef.current?.getEditor().root.innerHTML || content);
     setContent(currentContent);
     await onSubmit({
       title,

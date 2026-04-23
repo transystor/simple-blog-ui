@@ -102,3 +102,5 @@ form { margin: 0; }
 .image-size-controls { display: grid; grid-template-columns: minmax(260px, 1fr) auto; gap: 12px; align-items: center; }
 
 
+
+.article-content img { max-width: 100%; height: auto; display: block; }
