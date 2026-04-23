@@ -130,6 +130,13 @@ form { margin: 0; }
 .article-content p {
   margin: 0 0 1em;
 }
+.tiptap-editor .tiptap p {
+  margin: 0 0 1em;
+  line-height: 1.6;
+}
+.article-content p {
+  line-height: 1.6;
+}
 .article-content img[align="left"] {
   display: block;
   margin-left: 0;
