@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useRef, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import ImageResize from 'quill-image-resize-module-react';
 import 'react-quill/dist/quill.snow.css';
@@ -55,6 +55,7 @@ export function ArticleForm({
   const [content, setContent] = useState(initialValue?.content || '');
   const [status, setStatus] = useState<string>(String(initialValue?.status ?? 0));
   const quillRef = useRef<ReactQuill | null>(null);
+  const [editorKey, setEditorKey] = useState(0);
 
   const modules = useMemo(() => ({
     toolbar: {
@@ -93,6 +94,10 @@ export function ArticleForm({
     }
   }), []);
 
+  useEffect(() => {
+    setEditorKey(key => key + 1);
+  }, [initialValue?.id, initialValue?.updatedAt]);
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const currentContent = normalizeEditorHtml(quillRef.current?.getEditor().root.innerHTML || content);
@@ -116,7 +121,7 @@ export function ArticleForm({
         <option value="1">Published</option>
       </select>
       <div className="editor-shell">
-        <ReactQuill ref={quillRef} theme="snow" value={content} onChange={setContent} modules={modules} />
+        <ReactQuill key={editorKey} ref={quillRef} theme="snow" value={content} onChange={setContent} modules={modules} />
       </div>
       <div className="form-actions">
         <button className="button" type="submit">Сохранить</button>
