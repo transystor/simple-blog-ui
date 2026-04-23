@@ -1,16 +1,97 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { EditorContent, useEditor } from '@tiptap/react';
+import { EditorContent, NodeViewWrapper, ReactNodeViewRenderer, mergeAttributes, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import Placeholder from '@tiptap/extension-placeholder';
+import TextAlign from '@tiptap/extension-text-align';
 import type { Article } from '../types';
 import { api } from '../lib/api';
 import { auth } from '../lib/auth';
 
 type ArticleDraft = Partial<Article>;
+type ImageAlign = 'left' | 'center' | 'right';
+
+const CustomImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      width: {
+        default: null,
+      },
+      align: {
+        default: 'center',
+      },
+    };
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    const align = (HTMLAttributes.align as ImageAlign | undefined) || 'center';
+    const width = HTMLAttributes.width as string | undefined;
+    const styleParts = ['max-width:100%', 'height:auto', 'display:block'];
+
+    if (width) styleParts.push(`width:${width}`);
+    if (align === 'left') styleParts.push('margin-left:0', 'margin-right:auto');
+    else if (align === 'right') styleParts.push('margin-left:auto', 'margin-right:0');
+    else styleParts.push('margin-left:auto', 'margin-right:auto');
+
+    return ['img', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+      style: styleParts.join(';')
+    })];
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(({ node, updateAttributes, selected }) => {
+      const [width, setWidth] = useState((node.attrs.width as string) || '');
+      const align = (node.attrs.align as ImageAlign) || 'center';
+
+      useEffect(() => {
+        setWidth((node.attrs.width as string) || '');
+      }, [node.attrs.width]);
+
+      const applyWidth = () => {
+        const normalized = width.trim();
+        updateAttributes({ width: normalized ? (/^\d+$/.test(normalized) ? `${normalized}px` : normalized) : null });
+      };
+
+      return (
+        <NodeViewWrapper className={`tiptap-image-node ${selected ? 'selected' : ''}`}>
+          <img
+            src={node.attrs.src}
+            alt={node.attrs.alt || ''}
+            title={node.attrs.title || ''}
+            style={{
+              width: (node.attrs.width as string) || undefined,
+              maxWidth: '100%',
+              height: 'auto',
+              display: 'block',
+              marginLeft: align === 'left' ? '0' : 'auto',
+              marginRight: align === 'right' ? '0' : 'auto',
+            }}
+          />
+          {selected && (
+            <div className="tiptap-image-controls">
+              <input
+                className="input"
+                value={width}
+                onChange={e => setWidth(e.target.value)}
+                placeholder="300px или 50%"
+              />
+              <div className="row image-align-buttons">
+                <button type="button" className={`button secondary ${align === 'left' ? 'active' : ''}`} onClick={() => updateAttributes({ align: 'left' })}>Слева</button>
+                <button type="button" className={`button secondary ${align === 'center' ? 'active' : ''}`} onClick={() => updateAttributes({ align: 'center' })}>По центру</button>
+                <button type="button" className={`button secondary ${align === 'right' ? 'active' : ''}`} onClick={() => updateAttributes({ align: 'right' })}>Справа</button>
+                <button type="button" className="button" onClick={applyWidth}>Применить</button>
+              </div>
+            </div>
+          )}
+        </NodeViewWrapper>
+      );
+    });
+  },
+});
 
 export function ArticleForm({
   initialValue,
@@ -31,7 +112,8 @@ export function ArticleForm({
     StarterKit,
     TextStyle,
     Color,
-    Image.configure({ inline: false, allowBase64: false }),
+    TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    CustomImage.configure({ inline: false, allowBase64: false }),
     Link.configure({ openOnClick: false, autolink: true, defaultProtocol: 'https' }),
     Placeholder.configure({ placeholder: 'Текст статьи...' })
   ], []);
@@ -40,9 +122,7 @@ export function ArticleForm({
     extensions,
     content,
     immediatelyRender: false,
-    onUpdate: ({ editor }) => {
-      setContent(editor.getHTML());
-    }
+    onUpdate: ({ editor }) => setContent(editor.getHTML())
   });
 
   useEffect(() => {
@@ -64,7 +144,7 @@ export function ArticleForm({
       if (!file || !token || !editor) return;
 
       const result = await api.uploadImage(token, file);
-      editor.chain().focus().setImage({ src: `${window.location.origin}${result.url}` }).run();
+      editor.chain().focus().setImage({ src: `${window.location.origin}${result.url}`, align: 'center' }).run();
     };
   }
 
@@ -72,13 +152,11 @@ export function ArticleForm({
     if (!editor) return;
     const previousUrl = editor.getAttributes('link').href as string | undefined;
     const url = window.prompt('URL ссылки', previousUrl || 'https://');
-
     if (url === null) return;
     if (url === '') {
       editor.chain().focus().unsetLink().run();
       return;
     }
-
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   }
 
