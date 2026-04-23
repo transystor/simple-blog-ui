@@ -162,3 +162,11 @@ form { margin: 0; }
 }
 
 .article-content img { float: none !important; }
+
+
+.article-content p.is-editor-empty:empty,
+.article-content p:empty,
+.tiptap-editor .tiptap p.is-empty,
+.tiptap-editor .tiptap p:empty {
+  min-height: 1.6em;
+}
