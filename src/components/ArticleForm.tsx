@@ -1,12 +1,9 @@
 import { FormEvent, useMemo, useRef, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
-import BlotFormatter from '@enzedonline/quill-blot-formatter2';
 import 'react-quill/dist/quill.snow.css';
 import type { Article } from '../types';
 import { api } from '../lib/api';
 import { auth } from '../lib/auth';
-
-Quill.register('modules/blotFormatter2', BlotFormatter);
 
 type ArticleDraft = Partial<Article>;
 
@@ -88,24 +85,6 @@ export function ArticleForm({
         }
       }
     },
-    blotFormatter2: {
-      align: {
-        allowAligning: true,
-        alignments: ['left', 'center', 'right']
-      },
-      resize: {
-        allowResizing: true,
-        allowResizeModeChange: false,
-        useRelativeSize: false,
-        imageOversizeProtection: true,
-        minimumWidthPx: 40
-      },
-      image: {
-        allowAltTitleEdit: false,
-        allowCompressor: false,
-        autoHeight: true
-      }
-    }
   }), []);
 
   async function handleSubmit(event: FormEvent) {
@@ -126,6 +105,7 @@ export function ArticleForm({
       <input className="input" value={title} onChange={e => setTitle(e.target.value)} placeholder="Заголовок" />
       <input className="input" value={summary} onChange={e => setSummary(e.target.value)} placeholder="Краткое описание" />
       <input className="input" value={slug} onChange={e => setSlug(e.target.value)} placeholder="Slug (необязательно)" />
+      <div className="muted">Пока оставила стабильный resize без нового форматтера, чтобы админка снова работала без ошибок.</div>
       <select className="select" value={status} onChange={e => setStatus(e.target.value)}>
         <option value="0">Черновик</option>
         <option value="1">Опубликовано</option>
