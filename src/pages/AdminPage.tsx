@@ -5,6 +5,10 @@ import { ApiError, api } from '../lib/api';
 import { auth } from '../lib/auth';
 import type { Article, SiteSettings } from '../types';
 
+function getStatusLabel(status: number) {
+  return status === 1 ? 'Опубликовано' : 'Черновик';
+}
+
 export function AdminPage() {
   const token = auth.getToken();
   const [articles, setArticles] = useState<Article[]>([]);
@@ -162,7 +166,7 @@ export function AdminPage() {
             <div className="row" style={{ justifyContent: 'space-between' }}>
               <div>
                 <h2 className="article-title">{article.title}</h2>
-                <div className="muted">{article.slug} · {String(article.status)}</div>
+                <div className="muted">{article.slug} · {getStatusLabel(article.status)}</div>
               </div>
               <div className="row">
                 <button className="button secondary" onClick={() => { setEditing(article); setCreating(false); }}>Редактировать</button>
