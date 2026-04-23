@@ -92,6 +92,16 @@ export function AdminPage() {
                   <option value="tag">Тег</option>
                 </select>
                 <input
+                  className="input site-link-priority"
+                  type="number"
+                  value={link.priority}
+                  onChange={e => setSiteSettings({
+                    ...siteSettings,
+                    headerLinks: siteSettings.headerLinks.map((item, itemIndex) => itemIndex === index ? { ...item, priority: Number(e.target.value) || 0 } : item)
+                  })}
+                  placeholder="Приоритет"
+                />
+                <input
                   className="input"
                   value={link.value}
                   onChange={e => setSiteSettings({
@@ -135,7 +145,7 @@ export function AdminPage() {
               type="button"
               onClick={() => setSiteSettings({
                 ...siteSettings,
-                headerLinks: [...siteSettings.headerLinks, { label: 'новая кнопка', type: 'url', value: '/' }]
+                headerLinks: [...siteSettings.headerLinks, { label: 'новая кнопка', type: 'url', value: '/', priority: siteSettings.headerLinks.length }]
               })}
             >
               +

@@ -18,7 +18,7 @@ export function Layout({ children, settings }: PropsWithChildren<{ settings?: Si
           <Link to="/"><strong className="site-title">{settings.siteTitle}</strong></Link>
         </div>
         <div className="nav-right">
-          {[...settings.headerLinks].reverse().map((link, index) => (
+          {[...settings.headerLinks].sort((a, b) => a.priority - b.priority).reverse().map((link, index) => (
             <Link key={`${link.label}-${index}`} to={getHeaderLinkTarget(link.type, link.value)} className="nav-label">{link.label}</Link>
           ))}
         </div>

@@ -94,9 +94,9 @@ form { margin: 0; }
 .editor-shell .ql-container { border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
 .article-form .form-actions { margin-top: 0; padding-top: 0; }
 
-.nav-right { display: flex; flex-direction: row-reverse; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.nav-right { display: flex; flex-direction: row-reverse; gap: 22px; align-items: baseline; flex-wrap: wrap; }
 .site-links-stack { display: grid; gap: 12px; }
-.site-link-row { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.2fr) auto; gap: 12px; align-items: center; }
+.site-link-row { display: grid; grid-template-columns: minmax(160px, 1fr) 140px 110px minmax(220px, 1.2fr) auto; gap: 12px; align-items: center; }
 .icon-button { min-width: 44px; padding: 10px 12px; }
 
 .image-size-controls { display: grid; grid-template-columns: minmax(260px, 1fr) auto; gap: 12px; align-items: center; }

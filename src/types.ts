@@ -17,6 +17,7 @@ export interface HeaderLink {
   label: string;
   type: 'url' | 'tag';
   value: string;
+  priority: number;
 }
 
 export interface SiteSettings {
