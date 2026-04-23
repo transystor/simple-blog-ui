@@ -7,6 +7,7 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
+import Youtube from '@tiptap/extension-youtube';
 import type { Article } from '../types';
 import { api } from '../lib/api';
 import { auth } from '../lib/auth';
@@ -120,6 +121,14 @@ export function ArticleForm({
     TextAlign.configure({ types: ['heading', 'paragraph'] }),
     CustomImage.configure({ inline: false, allowBase64: false }),
     Link.configure({ openOnClick: false, autolink: true, defaultProtocol: 'https' }),
+    Youtube.configure({
+      controls: true,
+      nocookie: true,
+      modestBranding: true,
+      HTMLAttributes: {
+        class: 'article-video-embed'
+      }
+    }),
     Placeholder.configure({ placeholder: 'Текст статьи...' })
   ], []);
 
@@ -165,6 +174,13 @@ export function ArticleForm({
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   }
 
+  function insertYoutube() {
+    if (!editor) return;
+    const url = window.prompt('Ссылка на YouTube', 'https://www.youtube.com/watch?v=');
+    if (!url) return;
+    editor.chain().focus().setYoutubeVideo({ src: url, width: 840, height: 472 }).run();
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     await onSubmit({
@@ -197,6 +213,7 @@ export function ArticleForm({
           <button type="button" className={`button secondary ${editor?.isActive('blockquote') ? 'active' : ''}`} onClick={() => editor?.chain().focus().toggleBlockquote().run()}>Цитата</button>
           <button type="button" className={`button secondary ${editor?.isActive('link') ? 'active' : ''}`} onClick={setLink}>Ссылка</button>
           <button type="button" className="button secondary" onClick={insertImage}>Картинка</button>
+          <button type="button" className="button secondary" onClick={insertYoutube}>YouTube</button>
           <input type="color" className="color-input" onChange={e => editor?.chain().focus().setColor(e.target.value).run()} value="#111111" />
           <button type="button" className="button secondary" onClick={() => editor?.chain().focus().unsetAllMarks().clearNodes().run()}>Очистить</button>
         </div>

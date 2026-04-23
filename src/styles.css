@@ -117,6 +117,18 @@ form { margin: 0; }
 .tiptap-editor .tiptap { min-height: 320px; padding: 16px; outline: none; }
 .tiptap-editor .tiptap p { margin: 0 0 1em; }
 .tiptap-editor .tiptap img { max-width: 100%; height: auto; display: block; }
+.article-content iframe,
+.tiptap-editor iframe,
+.article-video-embed {
+  width: 100%;
+  max-width: 100%;
+  min-height: 320px;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 16px;
+  display: block;
+  margin: 0 auto 1rem;
+}
 .tiptap-editor .tiptap a { color: #2563eb; text-decoration: underline; }
 .color-input { width: 44px; height: 44px; padding: 4px; border: 1px solid #d1d5db; border-radius: 10px; background: #fff; }
 .button.active { background: #111827; color: #fff; }
