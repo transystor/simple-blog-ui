@@ -187,7 +187,7 @@ export function AdminPage() {
             <div className="row" style={{ justifyContent: 'space-between' }}>
               <div>
                 <h2 className="article-title">{article.title}</h2>
-                <div className="muted">{article.slug} · {getStatusLabel(article.status)}</div>
+                <div className="muted">{article.slug} · {getStatusLabel(article.status)} · {article.uniqueViews} уник. / {article.totalViews} всего</div>
               </div>
               <div className="row">
                 <button className="button secondary" onClick={() => { setEditing(article); setCreating(false); }}>Редактировать</button>

@@ -39,6 +39,11 @@ export const api = {
     }),
   getArticles: (tag?: string) => request<Article[]>(`/api/articles${tag ? `?tag=${encodeURIComponent(tag)}` : ''}`),
   getArticle: (slug: string) => request<Article>(`/api/articles/${slug}`),
+  registerArticleView: (slug: string, visitorId: string) =>
+    request<{ totalViews: number; uniqueViews: number }>(`/api/articles/${slug}/view`, {
+      method: 'POST',
+      body: JSON.stringify({ visitorId })
+    }),
   getSiteSettings: () => request<SiteSettings>('/api/site-settings'),
   getAdminArticles: (token: string) =>
     request<Article[]>('/api/admin/articles', {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../lib/api';
+import { auth } from '../lib/auth';
 import type { Article } from '../types';
 
 export function ArticlePage() {
@@ -9,6 +10,7 @@ export function ArticlePage() {
 
   useEffect(() => {
     api.getArticle(slug).then(setArticle);
+    api.registerArticleView(slug, auth.getVisitorId()).catch(() => undefined);
   }, [slug]);
 
   if (!article) return <div className="card">Грузим...</div>;

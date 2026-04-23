@@ -11,6 +11,8 @@ export interface Article {
   updatedAt: string;
   publishedAt?: string | null;
   tags: string[];
+  totalViews: number;
+  uniqueViews: number;
 }
 
 export interface HeaderLink {
