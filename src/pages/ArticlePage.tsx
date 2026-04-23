@@ -25,7 +25,7 @@ export function ArticlePage() {
       <div className="article-content" style={{ lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: article.content }} />
       <div className="article-views-badge muted">
         <img src={eyeIcon} alt="Просмотры" className="article-views-icon" />
-        <span>{article.uniqueViews}</span>
+        <span>{article.totalViews}</span>
       </div>
     </article>
   );
