@@ -10,11 +10,13 @@ export interface Article {
   createdAt: string;
   updatedAt: string;
   publishedAt?: string | null;
+  tags: string[];
 }
 
 export interface HeaderLink {
   label: string;
-  url: string;
+  type: 'url' | 'tag';
+  value: string;
 }
 
 export interface SiteSettings {

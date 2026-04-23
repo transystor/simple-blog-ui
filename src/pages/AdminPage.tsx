@@ -78,16 +78,27 @@ export function AdminPage() {
                     ...siteSettings,
                     headerLinks: siteSettings.headerLinks.map((item, itemIndex) => itemIndex === index ? { ...item, label: e.target.value } : item)
                   })}
-                  placeholder="Текст ссылки"
+                  placeholder="Текст кнопки"
                 />
-                <input
-                  className="input"
-                  value={link.url}
+                <select
+                  className="select"
+                  value={link.type}
                   onChange={e => setSiteSettings({
                     ...siteSettings,
-                    headerLinks: siteSettings.headerLinks.map((item, itemIndex) => itemIndex === index ? { ...item, url: e.target.value } : item)
+                    headerLinks: siteSettings.headerLinks.map((item, itemIndex) => itemIndex === index ? { ...item, type: e.target.value as 'url' | 'tag' } : item)
                   })}
-                  placeholder="URL ссылки"
+                >
+                  <option value="url">Ссылка</option>
+                  <option value="tag">Тег</option>
+                </select>
+                <input
+                  className="input"
+                  value={link.value}
+                  onChange={e => setSiteSettings({
+                    ...siteSettings,
+                    headerLinks: siteSettings.headerLinks.map((item, itemIndex) => itemIndex === index ? { ...item, value: e.target.value } : item)
+                  })}
+                  placeholder={link.type === 'tag' ? 'Название тега' : 'URL ссылки'}
                 />
                 <button
                   className="button danger icon-button"
@@ -124,7 +135,7 @@ export function AdminPage() {
               type="button"
               onClick={() => setSiteSettings({
                 ...siteSettings,
-                headerLinks: [...siteSettings.headerLinks, { label: 'новая ссылка', url: '/' }]
+                headerLinks: [...siteSettings.headerLinks, { label: 'новая кнопка', type: 'url', value: '/' }]
               })}
             >
               +

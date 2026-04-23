@@ -112,6 +112,7 @@ export function ArticleForm({
   const [summary, setSummary] = useState(initialValue?.summary || '');
   const [slug, setSlug] = useState(initialValue?.slug || '');
   const [status, setStatus] = useState<string>(String(initialValue?.status ?? 0));
+  const [tags, setTags] = useState((initialValue?.tags || []).join(', '));
   const [content, setContent] = useState(initialValue?.content || '');
 
   const extensions = useMemo(() => [
@@ -188,7 +189,8 @@ export function ArticleForm({
       summary,
       slug,
       content: editor?.getHTML() || content,
-      status: Number(status)
+      status: Number(status),
+      tags: tags.split(',').map(tag => tag.trim()).filter(Boolean)
     });
   }
 
@@ -197,6 +199,7 @@ export function ArticleForm({
       <input className="input" value={title} onChange={e => setTitle(e.target.value)} placeholder="Заголовок" />
       <input className="input" value={summary} onChange={e => setSummary(e.target.value)} placeholder="Краткое описание" />
       <input className="input" value={slug} onChange={e => setSlug(e.target.value)} placeholder="Slug (необязательно)" />
+      <input className="input" value={tags} onChange={e => setTags(e.target.value)} placeholder="Теги через запятую" />
       <select className="select" value={status} onChange={e => setStatus(e.target.value)}>
         <option value="0">Черновик</option>
         <option value="1">Опубликовано</option>

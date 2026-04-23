@@ -37,7 +37,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ email, password })
     }),
-  getArticles: () => request<Article[]>('/api/articles'),
+  getArticles: (tag?: string) => request<Article[]>(`/api/articles${tag ? `?tag=${encodeURIComponent(tag)}` : ''}`),
   getArticle: (slug: string) => request<Article>(`/api/articles/${slug}`),
   getSiteSettings: () => request<SiteSettings>('/api/site-settings'),
   getAdminArticles: (token: string) =>
