@@ -182,3 +182,24 @@ form { margin: 0; }
 .tiptap-editor .tiptap p:empty {
   min-height: 1.6em;
 }
+
+.article-page-card {
+  position: relative;
+  padding-bottom: 56px;
+}
+
+.article-views-badge {
+  position: absolute;
+  right: 20px;
+  bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.article-views-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
