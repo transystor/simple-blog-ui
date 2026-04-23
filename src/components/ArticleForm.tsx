@@ -120,6 +120,8 @@ export function ArticleForm({
     const image = selectedImageRef.current;
     if (!image) return;
 
+    image.classList.add('editor-image-selected');
+
     const normalizedWidth = imageWidth.trim();
     if (!normalizedWidth) {
       image.style.removeProperty('width');
@@ -133,6 +135,7 @@ export function ArticleForm({
 
     image.dataset.align = imageAlign;
     image.style.display = 'block';
+    image.style.maxWidth = '100%';
 
     if (imageAlign === 'left') {
       image.style.marginLeft = '0';
@@ -145,7 +148,11 @@ export function ArticleForm({
       image.style.marginRight = 'auto';
     }
 
-    setContent(quillRef.current?.getEditor().root.innerHTML || content);
+    const editor = quillRef.current?.getEditor();
+    if (editor) {
+      editor.root.dispatchEvent(new Event('input', { bubbles: true }));
+      setContent(editor.root.innerHTML);
+    }
   }
 
   async function handleSubmit(event: FormEvent) {
