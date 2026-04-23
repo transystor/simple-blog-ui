@@ -1,12 +1,12 @@
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useMemo, useRef, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
-import ImageResize from 'quill-image-resize-module-react';
+import BlotFormatter from '@enzedonline/quill-blot-formatter2';
 import 'react-quill/dist/quill.snow.css';
 import type { Article } from '../types';
 import { api } from '../lib/api';
 import { auth } from '../lib/auth';
 
-Quill.register('modules/imageResize', ImageResize);
+Quill.register('modules/blotFormatter2', BlotFormatter);
 
 type ArticleDraft = Partial<Article>;
 
@@ -18,23 +18,24 @@ function normalizeEditorHtml(html: string) {
 
   wrapper.querySelectorAll('img').forEach(image => {
     const img = image as HTMLImageElement;
-    img.style.display = 'block';
     img.style.maxWidth = '100%';
     img.style.height = img.style.height || 'auto';
 
-    const marginLeft = img.style.marginLeft;
-    const marginRight = img.style.marginRight;
-
-    if ((marginLeft === '0px' || marginLeft === '0') && marginRight === 'auto') {
+    const floatValue = img.style.cssFloat || img.style.float;
+    if (floatValue === 'left') {
+      img.style.display = 'block';
       img.style.marginLeft = '0';
       img.style.marginRight = 'auto';
-    } else if (marginLeft === 'auto' && (marginRight === '0px' || marginRight === '0')) {
+    } else if (floatValue === 'right') {
+      img.style.display = 'block';
       img.style.marginLeft = 'auto';
       img.style.marginRight = '0';
-    } else {
+    } else if (img.style.display === 'block') {
       img.style.marginLeft = 'auto';
       img.style.marginRight = 'auto';
     }
+
+    img.style.removeProperty('float');
   });
 
   return wrapper.innerHTML;
@@ -55,7 +56,6 @@ export function ArticleForm({
   const [content, setContent] = useState(initialValue?.content || '');
   const [status, setStatus] = useState<string>(String(initialValue?.status ?? 0));
   const quillRef = useRef<ReactQuill | null>(null);
-  const [editorKey, setEditorKey] = useState(0);
 
   const modules = useMemo(() => ({
     toolbar: {
@@ -88,15 +88,25 @@ export function ArticleForm({
         }
       }
     },
-    imageResize: {
-      parchment: Quill.import('parchment'),
-      modules: ['Resize', 'DisplaySize', 'Toolbar']
+    blotFormatter2: {
+      align: {
+        allowAligning: true,
+        alignments: ['left', 'center', 'right']
+      },
+      resize: {
+        allowResizing: true,
+        allowResizeModeChange: false,
+        useRelativeSize: false,
+        imageOversizeProtection: true,
+        minimumWidthPx: 40
+      },
+      image: {
+        allowAltTitleEdit: false,
+        allowCompressor: false,
+        autoHeight: true
+      }
     }
   }), []);
-
-  useEffect(() => {
-    setEditorKey(key => key + 1);
-  }, [initialValue?.id, initialValue?.updatedAt]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -113,15 +123,15 @@ export function ArticleForm({
 
   return (
     <form className="card article-form" onSubmit={handleSubmit}>
-      <input className="input" value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" />
-      <input className="input" value={summary} onChange={e => setSummary(e.target.value)} placeholder="Summary" />
-      <input className="input" value={slug} onChange={e => setSlug(e.target.value)} placeholder="Slug (optional)" />
+      <input className="input" value={title} onChange={e => setTitle(e.target.value)} placeholder="Заголовок" />
+      <input className="input" value={summary} onChange={e => setSummary(e.target.value)} placeholder="Краткое описание" />
+      <input className="input" value={slug} onChange={e => setSlug(e.target.value)} placeholder="Slug (необязательно)" />
       <select className="select" value={status} onChange={e => setStatus(e.target.value)}>
-        <option value="0">Draft</option>
-        <option value="1">Published</option>
+        <option value="0">Черновик</option>
+        <option value="1">Опубликовано</option>
       </select>
       <div className="editor-shell">
-        <ReactQuill key={editorKey} ref={quillRef} theme="snow" value={content} onChange={setContent} modules={modules} />
+        <ReactQuill ref={quillRef} theme="snow" value={content} onChange={setContent} modules={modules} />
       </div>
       <div className="form-actions">
         <button className="button" type="submit">Сохранить</button>
