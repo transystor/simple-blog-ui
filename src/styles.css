@@ -153,3 +153,5 @@ form { margin: 0; }
 .article-content img {
   clear: both;
 }
+
+.article-content img { float: none !important; }

@@ -38,6 +38,7 @@ const CustomImage = Image.extend({
     else styleParts.push('margin-left:auto', 'margin-right:auto');
 
     return ['img', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+      align: null,
       style: styleParts.join(';')
     })];
   },
