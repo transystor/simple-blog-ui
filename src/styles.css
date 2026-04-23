@@ -104,3 +104,8 @@ form { margin: 0; }
 
 
 .article-content img { max-width: 100%; height: auto; display: block; }
+
+.image-settings-panel { display: grid; gap: 12px; padding: 16px; }
+.image-settings-grid { display: grid; gap: 12px; }
+.image-align-buttons .button.active { background: #111827; color: #fff; }
+.article-form .ql-editor img { max-width: 100%; height: auto; }
