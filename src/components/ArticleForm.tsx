@@ -7,81 +7,6 @@ import { auth } from '../lib/auth';
 
 type ArticleDraft = Partial<Article>;
 
-type ImageFormat = {
-  src: string;
-  width?: string;
-  align?: 'left' | 'center' | 'right';
-};
-
-function transformImageInHtml(html: string, format: ImageFormat) {
-  if (typeof document === 'undefined') return html;
-
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = html;
-
-  const img = Array.from(wrapper.querySelectorAll('img')).find(node => (node as HTMLImageElement).src === format.src) as HTMLImageElement | undefined;
-  if (!img) return html;
-
-  const width = format.width?.trim() || '';
-  if (width) {
-    img.style.width = /^\d+$/.test(width) ? `${width}px` : width;
-  } else {
-    img.style.removeProperty('width');
-  }
-
-  img.style.maxWidth = '100%';
-  img.style.height = 'auto';
-  img.style.display = 'block';
-
-  const align = format.align || 'center';
-  img.dataset.align = align;
-  if (align === 'left') {
-    img.style.marginLeft = '0';
-    img.style.marginRight = 'auto';
-  } else if (align === 'right') {
-    img.style.marginLeft = 'auto';
-    img.style.marginRight = '0';
-  } else {
-    img.style.marginLeft = 'auto';
-    img.style.marginRight = 'auto';
-  }
-
-  return wrapper.innerHTML;
-}
-
-function normalizeImageHtml(html: string) {
-  if (typeof document === 'undefined') return html;
-
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = html;
-
-  wrapper.querySelectorAll('img').forEach(node => {
-    const img = node as HTMLImageElement;
-    img.style.maxWidth = '100%';
-    img.style.height = img.style.height || 'auto';
-    img.style.display = 'block';
-
-    const marginLeft = img.style.marginLeft;
-    const marginRight = img.style.marginRight;
-
-    if ((marginLeft === '0px' || marginLeft === '0') && marginRight === 'auto') {
-      img.dataset.align = 'left';
-      img.style.marginLeft = '0';
-      img.style.marginRight = 'auto';
-    } else if (marginLeft === 'auto' && (marginRight === '0px' || marginRight === '0')) {
-      img.dataset.align = 'right';
-      img.style.marginLeft = 'auto';
-      img.style.marginRight = '0';
-    } else {
-      img.dataset.align = 'center';
-      img.style.marginLeft = 'auto';
-      img.style.marginRight = 'auto';
-    }
-  });
-
-  return wrapper.innerHTML;
-}
-
 export function ArticleForm({
   initialValue,
   onSubmit,
@@ -96,7 +21,6 @@ export function ArticleForm({
   const [slug, setSlug] = useState(initialValue?.slug || '');
   const [content, setContent] = useState(initialValue?.content || '');
   const [status, setStatus] = useState<string>(String(initialValue?.status ?? 0));
-  const [selectedImage, setSelectedImage] = useState<ImageFormat | null>(null);
   const quillRef = useRef<ReactQuill | null>(null);
 
   const modules = useMemo(() => ({
@@ -132,28 +56,9 @@ export function ArticleForm({
     }
   }), []);
 
-  function syncSelectedImageFromClick(event: React.MouseEvent<HTMLDivElement>) {
-    const target = event.target as HTMLElement | null;
-    if (target?.tagName !== 'IMG') return;
-
-    const image = target as HTMLImageElement;
-    setSelectedImage({
-      src: image.src,
-      width: image.style.width || '',
-      align: (image.dataset.align as 'left' | 'center' | 'right') || 'center'
-    });
-  }
-
-  function applySelectedImage() {
-    if (!selectedImage) return;
-    const currentHtml = quillRef.current?.getEditor().root.innerHTML || content;
-    const updatedHtml = transformImageInHtml(currentHtml, selectedImage);
-    setContent(updatedHtml);
-  }
-
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    const currentContent = normalizeImageHtml(quillRef.current?.getEditor().root.innerHTML || content);
+    const currentContent = quillRef.current?.getEditor().root.innerHTML || content;
     setContent(currentContent);
     await onSubmit({
       title,
@@ -173,28 +78,8 @@ export function ArticleForm({
         <option value="0">Черновик</option>
         <option value="1">Опубликовано</option>
       </select>
-
-      {selectedImage && (
-        <div className="card image-settings-panel">
-          <div className="muted">Настройки выбранной картинки</div>
-          <div className="image-settings-grid">
-            <input
-              className="input"
-              value={selectedImage.width || ''}
-              onChange={e => setSelectedImage({ ...selectedImage, width: e.target.value })}
-              placeholder="Ширина, например 300px или 50%"
-            />
-            <div className="row image-align-buttons">
-              <button type="button" className={`button secondary ${selectedImage.align === 'left' ? 'active' : ''}`} onClick={() => setSelectedImage({ ...selectedImage, align: 'left' })}>Слева</button>
-              <button type="button" className={`button secondary ${selectedImage.align === 'center' ? 'active' : ''}`} onClick={() => setSelectedImage({ ...selectedImage, align: 'center' })}>По центру</button>
-              <button type="button" className={`button secondary ${selectedImage.align === 'right' ? 'active' : ''}`} onClick={() => setSelectedImage({ ...selectedImage, align: 'right' })}>Справа</button>
-              <button type="button" className="button" onClick={applySelectedImage}>Применить</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="editor-shell" onClick={syncSelectedImageFromClick}>
+      <div className="editor-help muted">Пока оставила стабильный редактор: загрузка и вставка картинок работают, расширенное управление размером и выравниванием вынесем в следующую итерацию.</div>
+      <div className="editor-shell">
         <ReactQuill ref={quillRef} theme="snow" value={content} onChange={setContent} modules={modules} />
       </div>
       <div className="form-actions">
