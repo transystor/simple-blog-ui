@@ -92,8 +92,15 @@ export function ArticleForm({
         image.classList.add('editor-image-selected');
         selectedImageRef.current = image;
         setImageWidth(image.style.width || '');
-        const justifyContent = image.parentElement?.style.justifyContent;
-        setImageAlign(justifyContent === 'flex-start' ? 'left' : justifyContent === 'flex-end' ? 'right' : 'center');
+        const marginLeft = image.style.marginLeft;
+        const marginRight = image.style.marginRight;
+        if (marginLeft === '0px' || marginLeft === '0') {
+          setImageAlign('left');
+        } else if (marginRight === '0px' || marginRight === '0') {
+          setImageAlign('right');
+        } else {
+          setImageAlign('center');
+        }
         updatePopoverForImage(image);
       } else if (!(target?.closest('.image-popover'))) {
         clearSelection();
@@ -119,40 +126,32 @@ export function ArticleForm({
 
   function applyImageSettings() {
     const image = selectedImageRef.current;
-    const editor = quillRef.current?.getEditor();
-    if (!image || !editor) return;
+    if (!image) return;
 
     const normalizedWidth = imageWidth.trim();
-    const finalWidth = !normalizedWidth ? 'auto' : /^\d+$/.test(normalizedWidth) ? `${normalizedWidth}px` : normalizedWidth;
-    const justifyContent = imageAlign === 'left' ? 'flex-start' : imageAlign === 'right' ? 'flex-end' : 'center';
-    const imageSrc = image.getAttribute('src') || '';
-    const imageAlt = image.getAttribute('alt') || '';
+    if (!normalizedWidth) {
+      image.style.removeProperty('width');
+    } else {
+      image.style.width = /^\d+$/.test(normalizedWidth) ? `${normalizedWidth}px` : normalizedWidth;
+    }
 
-    const wrapper = image.closest('p, div');
-    if (!wrapper) return;
+    image.style.maxWidth = '100%';
+    image.style.height = 'auto';
+    image.style.display = 'block';
 
-    const replacement = `<div style="display:flex;justify-content:${justifyContent};"><img src="${imageSrc}" alt="${imageAlt}" style="width:${finalWidth};max-width:100%;height:auto;" /></div>`;
-    wrapper.outerHTML = replacement;
+    if (imageAlign === 'left') {
+      image.style.marginLeft = '0';
+      image.style.marginRight = 'auto';
+    } else if (imageAlign === 'right') {
+      image.style.marginLeft = 'auto';
+      image.style.marginRight = '0';
+    } else {
+      image.style.marginLeft = 'auto';
+      image.style.marginRight = 'auto';
+    }
 
-    const updatedHtml = editor.root.innerHTML;
-    setContent(updatedHtml);
-
-    requestAnimationFrame(() => {
-      const refreshedEditor = quillRef.current?.getEditor();
-      if (!refreshedEditor) return;
-      const refreshedImages = refreshedEditor.root.querySelectorAll('img');
-      const refreshedImage = Array.from(refreshedImages).find(img => img.getAttribute('src') === imageSrc) as HTMLImageElement | undefined;
-      if (!refreshedImage) return;
-      refreshedEditor.root.querySelectorAll('img').forEach(img => img.classList.remove('editor-image-selected'));
-      refreshedImage.classList.add('editor-image-selected');
-      selectedImageRef.current = refreshedImage;
-      const refreshedRect = refreshedEditor.root.getBoundingClientRect();
-      const imageRect = refreshedImage.getBoundingClientRect();
-      setPopoverPosition({
-        top: imageRect.top - refreshedRect.top + refreshedEditor.root.scrollTop - 56,
-        left: Math.max(12, imageRect.left - refreshedRect.left + refreshedEditor.root.scrollLeft)
-      });
-    });
+    setContent(quillRef.current?.getEditor().root.innerHTML || content);
+    setPopoverPosition(current => current ? { ...current } : current);
   }
 
   async function handleSubmit(event: FormEvent) {
