@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { ArticleForm } from '../components/ArticleForm';
-import { api } from '../lib/api';
+import { ApiError, api } from '../lib/api';
 import { auth } from '../lib/auth';
 import type { Article, SiteSettings } from '../types';
 
@@ -13,16 +13,35 @@ export function AdminPage() {
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saveMessage, setSaveMessage] = useState('');
+  const [sessionExpired, setSessionExpired] = useState(false);
+
+  function handleApiError(error: unknown) {
+    if (error instanceof ApiError && error.status === 401) {
+      auth.clearToken();
+      setSessionExpired(true);
+      return;
+    }
+
+    throw error;
+  }
 
   async function loadArticles() {
     if (!token) return;
-    const items = await api.getAdminArticles(token);
-    setArticles(items);
+    try {
+      const items = await api.getAdminArticles(token);
+      setArticles(items);
+    } catch (error) {
+      handleApiError(error);
+    }
   }
 
   async function loadSettings() {
-    const settings = await api.getSiteSettings();
-    setSiteSettings(settings);
+    try {
+      const settings = await api.getSiteSettings();
+      setSiteSettings(settings);
+    } catch (error) {
+      handleApiError(error);
+    }
   }
 
   useEffect(() => {
@@ -31,7 +50,7 @@ export function AdminPage() {
     Promise.all([loadArticles(), loadSettings()]).finally(() => setLoading(false));
   }, [token]);
 
-  if (!token) return <Navigate to="/admin/login" replace />;
+  if (!token || sessionExpired) return <Navigate to="/admin/login" replace />;
   if (loading) return <div className="card">Грузим...</div>;
 
   return (
@@ -85,9 +104,13 @@ export function AdminPage() {
             <button
               className="button"
               onClick={async () => {
-                const updated = await api.updateSiteSettings(token, siteSettings);
-                setSiteSettings(updated);
-                setSaveMessage('Сохранено');
+                try {
+                  const updated = await api.updateSiteSettings(token, siteSettings);
+                  setSiteSettings(updated);
+                  setSaveMessage('Сохранено');
+                } catch (error) {
+                  handleApiError(error);
+                }
               }}
             >
               Сохранить
@@ -117,14 +140,18 @@ export function AdminPage() {
           initialValue={editing || undefined}
           onCancel={() => { setCreating(false); setEditing(null); }}
           onSubmit={async value => {
-            if (editing) {
-              await api.updateArticle(token, editing.id, value);
-            } else {
-              await api.createArticle(token, value);
+            try {
+              if (editing) {
+                await api.updateArticle(token, editing.id, value);
+              } else {
+                await api.createArticle(token, value);
+              }
+              setCreating(false);
+              setEditing(null);
+              await loadArticles();
+            } catch (error) {
+              handleApiError(error);
             }
-            setCreating(false);
-            setEditing(null);
-            await loadArticles();
           }}
         />
       )}
@@ -139,7 +166,14 @@ export function AdminPage() {
               </div>
               <div className="row">
                 <button className="button secondary" onClick={() => { setEditing(article); setCreating(false); }}>Редактировать</button>
-                <button className="button danger" onClick={async () => { await api.deleteArticle(token, article.id); await loadArticles(); }}>Удалить</button>
+                <button className="button danger" onClick={async () => {
+                  try {
+                    await api.deleteArticle(token, article.id);
+                    await loadArticles();
+                  } catch (error) {
+                    handleApiError(error);
+                  }
+                }}>Удалить</button>
               </div>
             </div>
             <p>{article.summary}</p>

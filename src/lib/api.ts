@@ -2,6 +2,15 @@ import type { Article, SiteSettings } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(status: number, message?: string) {
+    super(message || `Request failed: ${status}`);
+    this.status = status;
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
@@ -12,7 +21,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
+    throw new ApiError(response.status);
   }
 
   if (response.status === 204) {
@@ -66,7 +75,7 @@ export const api = {
       headers: { Authorization: `Bearer ${token}` },
       body: form
     });
-    if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
+    if (!response.ok) throw new ApiError(response.status, `Upload failed: ${response.status}`);
     return response.json() as Promise<{ url: string }>;
   },
 };
