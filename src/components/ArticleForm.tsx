@@ -92,7 +92,8 @@ export function ArticleForm({
         image.classList.add('editor-image-selected');
         selectedImageRef.current = image;
         setImageWidth(image.style.width || '');
-        setImageAlign((image.dataset.align as ImageAlign) || 'center');
+        const justifyContent = image.parentElement?.style.justifyContent;
+        setImageAlign(justifyContent === 'flex-start' ? 'left' : justifyContent === 'flex-end' ? 'right' : 'center');
         updatePopoverForImage(image);
       } else if (!(target?.closest('.image-popover'))) {
         clearSelection();
@@ -118,41 +119,40 @@ export function ArticleForm({
 
   function applyImageSettings() {
     const image = selectedImageRef.current;
-    if (!image) return;
-
-    image.classList.add('editor-image-selected');
+    const editor = quillRef.current?.getEditor();
+    if (!image || !editor) return;
 
     const normalizedWidth = imageWidth.trim();
-    if (!normalizedWidth) {
-      image.style.removeProperty('width');
-      image.removeAttribute('width');
-    } else {
-      const finalWidth = /^\d+$/.test(normalizedWidth) ? `${normalizedWidth}px` : normalizedWidth;
-      image.style.width = finalWidth;
-      image.style.height = 'auto';
-      image.removeAttribute('width');
-    }
+    const finalWidth = !normalizedWidth ? 'auto' : /^\d+$/.test(normalizedWidth) ? `${normalizedWidth}px` : normalizedWidth;
+    const justifyContent = imageAlign === 'left' ? 'flex-start' : imageAlign === 'right' ? 'flex-end' : 'center';
+    const imageSrc = image.getAttribute('src') || '';
+    const imageAlt = image.getAttribute('alt') || '';
 
-    image.dataset.align = imageAlign;
-    image.style.display = 'block';
-    image.style.maxWidth = '100%';
+    const wrapper = image.closest('p, div');
+    if (!wrapper) return;
 
-    if (imageAlign === 'left') {
-      image.style.marginLeft = '0';
-      image.style.marginRight = 'auto';
-    } else if (imageAlign === 'right') {
-      image.style.marginLeft = 'auto';
-      image.style.marginRight = '0';
-    } else {
-      image.style.marginLeft = 'auto';
-      image.style.marginRight = 'auto';
-    }
+    const replacement = `<div style="display:flex;justify-content:${justifyContent};"><img src="${imageSrc}" alt="${imageAlt}" style="width:${finalWidth};max-width:100%;height:auto;" /></div>`;
+    wrapper.outerHTML = replacement;
 
-    const editor = quillRef.current?.getEditor();
-    if (editor) {
-      editor.root.dispatchEvent(new Event('input', { bubbles: true }));
-      setContent(editor.root.innerHTML);
-    }
+    const updatedHtml = editor.root.innerHTML;
+    setContent(updatedHtml);
+
+    requestAnimationFrame(() => {
+      const refreshedEditor = quillRef.current?.getEditor();
+      if (!refreshedEditor) return;
+      const refreshedImages = refreshedEditor.root.querySelectorAll('img');
+      const refreshedImage = Array.from(refreshedImages).find(img => img.getAttribute('src') === imageSrc) as HTMLImageElement | undefined;
+      if (!refreshedImage) return;
+      refreshedEditor.root.querySelectorAll('img').forEach(img => img.classList.remove('editor-image-selected'));
+      refreshedImage.classList.add('editor-image-selected');
+      selectedImageRef.current = refreshedImage;
+      const refreshedRect = refreshedEditor.root.getBoundingClientRect();
+      const imageRect = refreshedImage.getBoundingClientRect();
+      setPopoverPosition({
+        top: imageRect.top - refreshedRect.top + refreshedEditor.root.scrollTop - 56,
+        left: Math.max(12, imageRect.left - refreshedRect.left + refreshedEditor.root.scrollLeft)
+      });
+    });
   }
 
   async function handleSubmit(event: FormEvent) {
