@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { auth } from '../lib/auth';
 import type { Article } from '../types';
 import eyeIcon from '../../public/eye.png';
+import backArrowIcon from '../../public/back-arrow.png';
 
 export function ArticlePage() {
   const { slug = '' } = useParams();
@@ -23,6 +24,9 @@ export function ArticlePage() {
         <p className="muted">{article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Draft'}</p>
       </div>
       <div className="article-content" style={{ lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: article.content }} />
+      <Link to="/" className="article-back-button" aria-label="На главную">
+        <img src={backArrowIcon} alt="Назад" className="article-back-icon" />
+      </Link>
       <div className="article-views-badge muted">
         <img src={eyeIcon} alt="Просмотры" className="article-views-icon" />
         <span>{article.totalViews}</span>
