@@ -19,7 +19,6 @@ export function ArticlePage() {
         <h1 className="article-title">{article.title}</h1>
         <p className="muted">{article.publishedAt ? new Date(article.publishedAt).toLocaleString() : 'Draft'}</p>
       </div>
-      <p>{article.summary}</p>
       <div className="article-content" style={{ lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: article.content }} />
     </article>
   );
