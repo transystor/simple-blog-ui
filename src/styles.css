@@ -98,3 +98,6 @@ form { margin: 0; }
 .site-links-stack { display: grid; gap: 12px; }
 .site-link-row { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.2fr) auto; gap: 12px; align-items: center; }
 .icon-button { min-width: 44px; padding: 10px 12px; }
+
+.image-size-controls { display: grid; grid-template-columns: minmax(260px, 1fr) auto; gap: 12px; align-items: center; }
+.ql-editor img.editor-image-selected { outline: 3px solid rgba(37, 99, 235, 0.45); border-radius: 6px; }

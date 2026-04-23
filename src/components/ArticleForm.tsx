@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useRef, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import type { Article } from '../types';
@@ -22,6 +22,7 @@ export function ArticleForm({
   const [content, setContent] = useState(initialValue?.content || '');
   const [status, setStatus] = useState<string>(String(initialValue?.status ?? 0));
   const quillRef = useRef<ReactQuill | null>(null);
+  const [imageWidth, setImageWidth] = useState('');
 
   const modules = useMemo(() => ({
     toolbar: {
@@ -56,6 +57,48 @@ export function ArticleForm({
     }
   }), []);
 
+
+  useEffect(() => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor) return;
+
+    const root = editor.root;
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.tagName === 'IMG') {
+        const image = target as HTMLImageElement;
+        const currentWidth = image.style.width || (image.getAttribute('width') ? `${image.getAttribute('width')}px` : '');
+        setImageWidth(currentWidth);
+        root.querySelectorAll('img').forEach(img => img.classList.remove('editor-image-selected'));
+        image.classList.add('editor-image-selected');
+      } else {
+        root.querySelectorAll('img').forEach(img => img.classList.remove('editor-image-selected'));
+        setImageWidth('');
+      }
+    };
+
+    root.addEventListener('click', handleClick);
+    return () => root.removeEventListener('click', handleClick);
+  }, []);
+
+  function applyImageWidth() {
+    const editor = quillRef.current?.getEditor();
+    const selectedImage = editor?.root.querySelector('img.editor-image-selected') as HTMLImageElement | null;
+    if (!selectedImage) return;
+
+    const normalized = imageWidth.trim();
+    if (!normalized) {
+      selectedImage.style.removeProperty('width');
+      selectedImage.removeAttribute('width');
+      return;
+    }
+
+    const finalWidth = /^\d+$/.test(normalized) ? `${normalized}px` : normalized;
+    selectedImage.style.width = finalWidth;
+    selectedImage.style.height = 'auto';
+    selectedImage.removeAttribute('width');
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     await onSubmit({
@@ -76,6 +119,10 @@ export function ArticleForm({
         <option value="0">Draft</option>
         <option value="1">Published</option>
       </select>
+      <div className="image-size-controls">
+        <input className="input" value={imageWidth} onChange={e => setImageWidth(e.target.value)} placeholder="Ширина картинки, например 300px или 50%" />
+        <button className="button secondary" type="button" onClick={applyImageWidth}>Применить размер</button>
+      </div>
       <div className="editor-shell">
         <ReactQuill ref={quillRef} theme="snow" value={content} onChange={setContent} modules={modules} />
       </div>
