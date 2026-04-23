@@ -13,6 +13,42 @@ type ImageFormat = {
   align?: 'left' | 'center' | 'right';
 };
 
+function transformImageInHtml(html: string, format: ImageFormat) {
+  if (typeof document === 'undefined') return html;
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = html;
+
+  const img = Array.from(wrapper.querySelectorAll('img')).find(node => (node as HTMLImageElement).src === format.src) as HTMLImageElement | undefined;
+  if (!img) return html;
+
+  const width = format.width?.trim() || '';
+  if (width) {
+    img.style.width = /^\d+$/.test(width) ? `${width}px` : width;
+  } else {
+    img.style.removeProperty('width');
+  }
+
+  img.style.maxWidth = '100%';
+  img.style.height = 'auto';
+  img.style.display = 'block';
+
+  const align = format.align || 'center';
+  img.dataset.align = align;
+  if (align === 'left') {
+    img.style.marginLeft = '0';
+    img.style.marginRight = 'auto';
+  } else if (align === 'right') {
+    img.style.marginLeft = 'auto';
+    img.style.marginRight = '0';
+  } else {
+    img.style.marginLeft = 'auto';
+    img.style.marginRight = 'auto';
+  }
+
+  return wrapper.innerHTML;
+}
+
 function normalizeImageHtml(html: string) {
   if (typeof document === 'undefined') return html;
 
@@ -96,56 +132,9 @@ export function ArticleForm({
     }
   }), []);
 
-  function readEditorHtml() {
-    return quillRef.current?.getEditor().root.innerHTML || content;
-  }
-
-  function replaceSelectedImage(format: ImageFormat) {
-    if (typeof document === 'undefined') return;
-
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = readEditorHtml();
-
-    const img = Array.from(wrapper.querySelectorAll('img')).find(node => (node as HTMLImageElement).src === format.src) as HTMLImageElement | undefined;
-    if (!img) return;
-
-    if (format.width?.trim()) {
-      img.style.width = /^\d+$/.test(format.width.trim()) ? `${format.width.trim()}px` : format.width.trim();
-    } else {
-      img.style.removeProperty('width');
-    }
-
-    img.style.maxWidth = '100%';
-    img.style.height = 'auto';
-    img.style.display = 'block';
-
-    const align = format.align || 'center';
-    img.dataset.align = align;
-    if (align === 'left') {
-      img.style.marginLeft = '0';
-      img.style.marginRight = 'auto';
-    } else if (align === 'right') {
-      img.style.marginLeft = 'auto';
-      img.style.marginRight = '0';
-    } else {
-      img.style.marginLeft = 'auto';
-      img.style.marginRight = 'auto';
-    }
-
-    const updatedHtml = wrapper.innerHTML;
-    setContent(updatedHtml);
-    setSelectedImage({
-      src: format.src,
-      width: img.style.width,
-      align
-    });
-  }
-
   function syncSelectedImageFromClick(event: React.MouseEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement | null;
-    if (target?.tagName !== 'IMG') {
-      return;
-    }
+    if (target?.tagName !== 'IMG') return;
 
     const image = target as HTMLImageElement;
     setSelectedImage({
@@ -155,9 +144,16 @@ export function ArticleForm({
     });
   }
 
+  function applySelectedImage() {
+    if (!selectedImage) return;
+    const currentHtml = quillRef.current?.getEditor().root.innerHTML || content;
+    const updatedHtml = transformImageInHtml(currentHtml, selectedImage);
+    setContent(updatedHtml);
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    const currentContent = normalizeImageHtml(readEditorHtml());
+    const currentContent = normalizeImageHtml(quillRef.current?.getEditor().root.innerHTML || content);
     setContent(currentContent);
     await onSubmit({
       title,
@@ -192,7 +188,7 @@ export function ArticleForm({
               <button type="button" className={`button secondary ${selectedImage.align === 'left' ? 'active' : ''}`} onClick={() => setSelectedImage({ ...selectedImage, align: 'left' })}>Слева</button>
               <button type="button" className={`button secondary ${selectedImage.align === 'center' ? 'active' : ''}`} onClick={() => setSelectedImage({ ...selectedImage, align: 'center' })}>По центру</button>
               <button type="button" className={`button secondary ${selectedImage.align === 'right' ? 'active' : ''}`} onClick={() => setSelectedImage({ ...selectedImage, align: 'right' })}>Справа</button>
-              <button type="button" className="button" onClick={() => replaceSelectedImage(selectedImage)}>Применить</button>
+              <button type="button" className="button" onClick={applySelectedImage}>Применить</button>
             </div>
           </div>
         </div>
