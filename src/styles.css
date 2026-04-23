@@ -100,14 +100,5 @@ form { margin: 0; }
 .icon-button { min-width: 44px; padding: 10px 12px; }
 
 .image-size-controls { display: grid; grid-template-columns: minmax(260px, 1fr) auto; gap: 12px; align-items: center; }
-.ql-editor img.editor-image-selected { outline: 3px solid rgba(37, 99, 235, 0.45); border-radius: 6px; }
 
-.editor-shell-popover { position: relative; }
-.image-popover { position: absolute; z-index: 20; display: grid; gap: 10px; min-width: 260px; padding: 12px; background: #fff; border: 1px solid rgba(15, 23, 42, 0.12); border-radius: 12px; box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16); }
-.image-popover-align { display: flex; gap: 8px; flex-wrap: wrap; }
-.image-popover .button.active { background: #0f172a; color: #fff; border-color: #0f172a; }
-.ql-editor img.editor-image-selected { outline: 3px solid rgba(37, 99, 235, 0.45); border-radius: 6px; }
 
-.ql-editor img[data-align='left'] { display: block; margin-left: 0; margin-right: auto; }
-.ql-editor img[data-align='center'] { display: block; margin-left: auto; margin-right: auto; }
-.ql-editor img[data-align='right'] { display: block; margin-left: auto; margin-right: 0; }
