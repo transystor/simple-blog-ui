@@ -142,6 +142,13 @@ form { margin: 0; }
 .article-content p {
   margin: 0 0 1em;
 }
+.article-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+.article-content a:hover {
+  color: #1d4ed8;
+}
 .tiptap-editor .tiptap p {
   margin: 0 0 1em;
   line-height: 1.6;
